@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+.padding {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-right: 5px;
+}
+
+.theme-bg {
+  background-color: #CCFFD2;
+}
+
+.theme-text {
+  color: #007A0E;
+
+}
+
+.main-text {
+  /* color: #018911; */
+  color: #007A0E;
+
+}
+
+label,
+.sub-text {
+  color: #00680C;
+}
+
+input,
+textarea {
+  border: 0.5px solid #007A0E66;
+}
+
+.stroke-text {
+  font-family: "Winky Sans", sans-serif;
+  color: white;
+  -webkit-text-stroke: 2px #018911;
+  text-stroke: 2px #018911;
+}
+
+.baloo-bhai-2-slogan {
+  font-family: "Baloo Bhai 2", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.main {
+  background-image: url('/bg.png');
+  background-size: cover;
+  background-position: center;
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
