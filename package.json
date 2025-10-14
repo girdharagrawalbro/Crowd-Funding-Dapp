@@ -9,20 +9,32 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "@prisma/client": "^6.7.0",
+    "@reduxjs/toolkit": "^2.6.1",
+    "axios": "^1.8.4",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "ethers": "^6.13.5",
-    "next": "15.2.1",
+    "next": "^15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hot-toast": "^2.5.2"
+    "react-hot-toast": "^2.5.2",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@tailwindcss/postcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.1",
+    "@types/react": "19.1.2",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "eslint": "^9.25.1",
+    "eslint-config-next": "^15.2.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "hardhat": "^2.22.19",
+    "prisma": "^6.7.0",
     "tailwindcss": "^4"
   }
 }

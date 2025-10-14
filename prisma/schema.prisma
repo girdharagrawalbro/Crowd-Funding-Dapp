@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl= env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  name      String?
+  metaid    String     @unique
+  donations Donation[]
+  events    Event[]    @relation("EventToUser")
+}
+
+model Event {
+  id              Int        @id @default(autoincrement())
+  title           String
+  desc            String?
+  endDate         DateTime
+  createdAt       DateTime   @default(now())
+  goal            Float
+  currentDonation Float      @default(0)
+  doners          Donation[]
+  creator         User       @relation("EventToUser", fields: [userId], references: [id])
+  status          String
+  blockchainId    Int 
+}
+
+model Donation {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  eventId        Int
+  donationAmount Float
+  donatedAt      DateTime @default(now())
+  event          Event    @relation(fields: [eventId], references: [id])
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([eventId])
+}
