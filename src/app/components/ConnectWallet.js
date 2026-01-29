@@ -30,6 +30,16 @@ const ConnectWallet = ({ mobile = false }) => {
     if (isMobileDevice()) {
       if (window.ethereum) {
         try {
+          // Request account access first
+          const accounts = await window.ethereum.request({ 
+            method: "eth_requestAccounts" 
+          });
+          
+          if (!accounts || accounts.length === 0) {
+            toast.error("No accounts found. Please unlock MetaMask.");
+            return;
+          }
+
           const provider = new ethers.BrowserProvider(window.ethereum);
           const signer = await provider.getSigner();
           const account = await signer.getAddress();
@@ -41,12 +51,14 @@ const ConnectWallet = ({ mobile = false }) => {
           }));
           toast.success("Wallet Connected!");
            
-      dispatch(createUser({ metaid: account, name: 'User' }));
-          
-           
+          dispatch(createUser({ metaid: account, name: 'User' }));
         } catch (error) {
           console.error("Error connecting wallet:", error);
-          toast.error("Error connecting wallet!");
+          if (error.code === 4001) {
+            toast.error("Connection rejected. Please approve the request.");
+          } else {
+            toast.error("Error connecting wallet!");
+          }
         }
       } else {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -66,6 +78,16 @@ const ConnectWallet = ({ mobile = false }) => {
     }
 
     try {
+      // Request account access first
+      const accounts = await window.ethereum.request({ 
+        method: "eth_requestAccounts" 
+      });
+      
+      if (!accounts || accounts.length === 0) {
+        toast.error("No accounts found. Please unlock MetaMask.");
+        return;
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const account = await signer.getAddress();
@@ -79,7 +101,13 @@ const ConnectWallet = ({ mobile = false }) => {
       dispatch(createUser({ metaid: account, name: 'User' }));
     } catch (error) {
       console.error("Error connecting wallet:", error);
-      toast.error("Error connecting wallet!");
+      if (error.code === 4001) {
+        toast.error("Connection rejected. Please approve the request in MetaMask.");
+      } else if (error.code === -32002) {
+        toast.error("MetaMask is already processing a request. Please check your extension.");
+      } else {
+        toast.error("Failed to connect wallet. Please try again.");
+      }
     }
   };
 
@@ -172,7 +200,7 @@ const ConnectWallet = ({ mobile = false }) => {
         ) : (
           <button
             onClick={connectWallet}
-            className={`bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 rounded-full text-white ${mobile ? 'py-2 px-4 text-sm' : 'py-2 px-6'
+            className={`bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 rounded-full text-white font-medium shadow-md ${mobile ? 'py-2 px-4 text-sm' : 'py-2.5 px-6'
               }`}
           >
             Connect Wallet

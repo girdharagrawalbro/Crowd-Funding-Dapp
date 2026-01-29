@@ -1,5 +1,6 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400..800&family=Baloo+Bhaijaan+2:wght@400..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Winky+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 :root {
   --background: #ffffff;
@@ -13,37 +14,39 @@
 }
 
 .theme-bg {
-  background-color: #DBEAFE;
+  background-color: #CCFFD2;
 }
 
 .theme-text {
-  color: #1E40AF;
+  color: #007A0E;
 }
 
 .main-text {
-  /* color: #018911; */
-  color: #1E40AF;
-
+  color: #007A0E;
 }
 
 label,
 .sub-text {
-  color: #1E3A8A;
+  color: #00680C;
 }
 
 input,
 textarea {
-  border: 0.5px solid #1E40AF66;
+  border: 0.5px solid #007A0E66;
 }
 
 .stroke-text {
-  font-family: "Baloo Bhaijaan 2", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 600;
+  font-family: "Winky Sans", sans-serif;
   color: white;
-  -webkit-text-stroke: 5px #1E40AF;
-  paint-order: stroke fill;
-  /* Ensures stroke appears behind fill */
+  -webkit-text-stroke: 2px #018911;
+  text-stroke: 2px #018911;
+}
+
+.baloo-bhai-2-slogan {
+  font-family: "Baloo Bhai 2", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
 }
 
 
@@ -62,7 +65,7 @@ button {
 .halfCircle {
   width: 162px;
   height: 325px;
-  background-color: #DBEAFE;
+  background-color: #CCFFD2;
   border-radius: 0 162px 162px 0;
   position: absolute;
   left: 0;
@@ -123,7 +126,7 @@ button {
   right: 0;
   width: 200px;
   height: 200px;
-  background: linear-gradient(135deg, #60A5FA, #DBEAFE);
+  background: linear-gradient(135deg, #4ADE80, #CCFFD2);
   border-top-left-radius: 100%;
   animation: pulse 9s infinite alternate;
   z-index: -1;
@@ -135,7 +138,7 @@ button {
   left: 0;
   width: 240px;
   height: 320px;
-  background: linear-gradient(135deg, #60A5FA, #93C5FD);
+  background: linear-gradient(135deg, #4ADE80, #86EFAC);
   border-top-right-radius: 100%;
   animation: pulse 9s infinite alternate;
   z-index: -1;
@@ -147,7 +150,7 @@ button {
   left: 15%;
   width: 70px;
   height: 70px;
-  background-color: #93C5FD;
+  background-color: #86EFAC;
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
   animation: zoomOut 1s ease-out forwards;
@@ -160,7 +163,7 @@ button {
   left: 10%;
   width: 25px;
   height: 25px;
-  background-color: #1E40AF70;
+  background-color: #007A0E70;
   border-radius: 50%;
   z-index: -1;
 }
@@ -171,7 +174,7 @@ button {
   right: 10%;
   width: 70px;
   height: 70px;
-  background-color: #93C5FD;
+  background-color: #86EFAC;
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
   animation: zoomOut 1s ease-out forwards;
@@ -184,7 +187,7 @@ button {
   right: 10%;
   width: 25px;
   height: 25px;
-  background-color: #1E40AF70;
+  background-color: #007A0E70;
   border-radius: 50%;
   z-index: -1;
 }
@@ -196,7 +199,7 @@ button {
   right: -50px;
   width: 100px;
   height: 100px;
-  background: linear-gradient(135deg, #60A5FA, #DBEAFE);
+  background: linear-gradient(135deg, #4ADE80, #CCFFD2);
   border-radius: 50%;
   opacity: 0.3;
   z-index: -1;
@@ -208,7 +211,7 @@ button {
   left: -30px;
   width: 150px;
   height: 150px;
-  background: linear-gradient(135deg, #60A5FA, #93C5FD);
+  background: linear-gradient(135deg, #4ADE80, #86EFAC);
   border-radius: 50%;
   opacity: 0.3;
   z-index: -1;

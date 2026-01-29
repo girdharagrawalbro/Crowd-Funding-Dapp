@@ -9,30 +9,32 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm">
-      <div className="container mx-auto flex items-center justify-between px-4 py-3">
+      <div className="container mx-auto flex items-center justify-between px-4 py-2">
         {/* Logo Section */}
-        <div className="logo-section flex items-center gap-2">
+        <div className="logo-section flex flex-col text-center justify-center items-center">
           <Image 
               src="/logo.png" 
               alt="logo" 
               className="logo" 
-              width={45}
-              height={45}
+              width={55}
+              height={55}
               priority
           />
-          <h6 className="text-sm hidden sm:block text-black">CROWD FUNDING</h6>
+          <h6 className="text-xs hidden sm:block text-black">CROWD FUNDING</h6>
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-4 lg:gap-8 bg-[#DBEAFE] border border-blue-300 text-[#1E40AF] font-medium py-1 px-6 lg:px-8 rounded-full">
-          <Link href="/" className="hover:text-blue-700 px-2">Home</Link>
-          <Link href="/about" className="hover:text-blue-700 px-2">About</Link>
-          <Link href="/create" className="hover:text-blue-700 px-2">Create Campaign</Link>
+        <div className="hidden md:flex items-center gap-4">
+          <nav className="flex items-center gap-6 lg:gap-10 bg-gradient-to-r from-cyan-100 to-green-100 border border-green-200 text-teal-700 font-medium py-2 px-6 lg:px-10 rounded-full">
+            <Link href="/" className="hover:text-teal-900 transition-colors">Home</Link>
+            <Link href="/about" className="hover:text-teal-900 transition-colors">About</Link>
+            <Link href="/create" className="hover:text-teal-900 transition-colors">Create Campaign</Link>
+          </nav>
           <ConnectWallet />
-        </nav>
+        </div>
 
         {/* Mobile Menu Button */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 md:hidden">
           <ConnectWallet mobile />
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -53,25 +55,25 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-[#DBEAFE] border-t border-blue-300">
+        <div className="md:hidden theme-bg border-t border-green-300">
           <div className="container mx-auto px-4 py-3 flex flex-col space-y-4">
             <Link 
               href="/" 
-              className="text-[#1E40AF] font-medium py-2 hover:bg-blue-100 rounded px-2"
+              className="theme-text font-medium py-2 hover:bg-green-100 rounded px-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Home
             </Link>
             <Link 
               href="/about" 
-              className="text-[#1E40AF] font-medium py-2 hover:bg-blue-100 rounded px-2"
+              className="theme-text font-medium py-2 hover:bg-green-100 rounded px-2"
               onClick={() => setIsMenuOpen(false)}
             >
               About
             </Link>
             <Link 
               href="/create" 
-              className="text-[#1E40AF] font-medium py-2 hover:bg-blue-100 rounded px-2"
+              className="theme-text font-medium py-2 hover:bg-green-100 rounded px-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Create Campaign

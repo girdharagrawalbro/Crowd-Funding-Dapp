@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import { contractAddress, contractABI } from "../lib/constants";
 import { USE_MOCK_DATA, createMockCampaign, mockAccount } from "../lib/mockData";
@@ -7,11 +7,10 @@ import toast from 'react-hot-toast';
 import Circle from "../components/Circle";
 import { useDispatch } from 'react-redux';
 import { createEvent } from '../store/slices/eventSlice';
-import { useAccount } from 'wagmi';
 
 export default function CreateCampaign() {
     const dispatch = useDispatch();
-    const { address } = useAccount();
+    const [account, setAccount] = useState("");
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -19,6 +18,27 @@ export default function CreateCampaign() {
         deadline: "",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Get connected wallet address
+    useEffect(() => {
+        const getAccount = async () => {
+            if (USE_MOCK_DATA) {
+                setAccount(mockAccount);
+                return;
+            }
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: "eth_accounts" });
+                    if (accounts.length > 0) {
+                        setAccount(accounts[0]);
+                    }
+                } catch (error) {
+                    console.error("Error getting account:", error);
+                }
+            }
+        };
+        getAccount();
+    }, []);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -36,7 +56,7 @@ export default function CreateCampaign() {
 
             if (USE_MOCK_DATA) {
                 // Use mock data for demo
-                const ownerAddress = address || mockAccount;
+                const ownerAddress = account || mockAccount;
                 const result = await createMockCampaign({
                     owner: ownerAddress,
                     title: form.title,
@@ -131,10 +151,10 @@ export default function CreateCampaign() {
                     Create a Campaign
                 </h1>
 
-                <form onSubmit={createCampaign} className="border-2 border-blue-700 bg-white shadow-md rounded-lg px-4 sm:px-6 py-5 space-y-4 sm:space-y-6">
+                <form onSubmit={createCampaign} className="border-3 border-green-700 bg-white shadow-md rounded-lg px-4 sm:px-6 py-5 space-y-4 sm:space-y-6">
                     {/* Title Input */}
                     <div>
-                        <label htmlFor="title" className="block text-sm sm:text-base font-medium text-gray-700">
+                        <label htmlFor="title" className="block text-sm sm:text-base font-medium">
                             Title
                         </label>
                         <input
@@ -143,14 +163,14 @@ export default function CreateCampaign() {
                             value={form.title}
                             placeholder="Enter campaign title"
                             onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 sm:py-2.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                            className="mt-1 block w-full px-3 py-2 sm:py-2.5 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                             required
                         />
                     </div>
 
                     {/* Description Input */}
                     <div>
-                        <label htmlFor="description" className="block text-sm sm:text-base font-medium text-gray-700">
+                        <label htmlFor="description" className="block text-sm sm:text-base font-medium">
                             Description
                         </label>
                         <textarea
@@ -158,7 +178,7 @@ export default function CreateCampaign() {
                             value={form.description}
                             placeholder="Enter campaign description"
                             onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                             rows="4"
                             required
                         />
@@ -166,7 +186,7 @@ export default function CreateCampaign() {
 
                     {/* Goal Input */}
                     <div>
-                        <label htmlFor="goal" className="block text-sm sm:text-base font-medium text-gray-700">
+                        <label htmlFor="goal" className="block text-sm sm:text-base font-medium">
                             Goal (ETH)
                         </label>
                         <input
@@ -175,16 +195,16 @@ export default function CreateCampaign() {
                             value={form.goal}
                             placeholder="Enter goal amount in ETH"
                             onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                             min="0"
-                            step="0.01"
+                            step="0.0001"
                             required
                         />
                     </div>
 
                     {/* Deadline Input */}
                     <div>
-                        <label htmlFor="deadline" className="block text-sm sm:text-base font-medium text-gray-700">
+                        <label htmlFor="deadline" className="block text-sm sm:text-base font-medium">
                             Deadline
                         </label>
                         <input
@@ -192,7 +212,7 @@ export default function CreateCampaign() {
                             name="deadline"
                             value={form.deadline}
                             onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                            className="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm sm:text-base"
                             min={new Date().toISOString().slice(0, 16)}
                             required
                         />
@@ -203,7 +223,7 @@ export default function CreateCampaign() {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={`w-full border-2 border-blue-700 theme-bg text-blue-700 font-medium px-4 py-2 sm:py-2.5 rounded-full hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            className={`w-full border border-green-700 theme-bg text-green-600 font-medium px-4 py-2 sm:py-2.5 rounded-full hover:bg-green-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-200 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
                             {isSubmitting ? 'Creating...' : 'Create Campaign'}
                         </button>

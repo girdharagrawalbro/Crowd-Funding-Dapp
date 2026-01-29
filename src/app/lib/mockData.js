@@ -84,18 +84,18 @@ export const mockDonors = {
 // Mock account (simulates connected wallet)
 export const mockAccount = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
+// Simulate donation (for demo - updates mock data temporarily)
+let tempDonations = {};
+let tempCampaigns = [...mockCampaigns]; // Mutable copy of campaigns
+
 // Helper functions to work with mock data
 export const getMockCampaign = (id) => {
-  return mockCampaigns.find(c => c.id === parseInt(id)) || null;
+  return tempCampaigns.find(c => c.id === parseInt(id)) || null;
 };
 
 export const getMockDonors = (campaignId) => {
   return mockDonors[campaignId] || [];
 };
-
-// Simulate donation (for demo - updates mock data temporarily)
-let tempDonations = {};
-let tempCampaigns = [...mockCampaigns]; // Mutable copy of campaigns
 
 export const simulateDonation = (campaignId, amount) => {
   return new Promise((resolve) => {
