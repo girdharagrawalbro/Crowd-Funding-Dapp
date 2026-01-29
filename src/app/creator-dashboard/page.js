@@ -209,8 +209,20 @@ export default function CreatorDashboard () {
 
   const showDonors = async campaignId => {
     try {
-      const donors = await contract.getDonors(campaignId)
-      setDonors(donors)
+      let donorsList;
+      
+      if (USE_MOCK_DATA) {
+        // Use mock donors data
+        const mockDonorData = getMockDonors(campaignId);
+        donorsList = mockDonorData.map(d => ({
+          donor: d.account,
+          amount: ethers.parseEther(d.amount.toString())
+        }));
+      } else {
+        donorsList = await contract.getDonors(campaignId);
+      }
+      
+      setDonors(donorsList)
       setSelectedCampaign(campaigns.find(c => c.id === campaignId))
       setIsModalOpen(true)
     } catch (error) {
