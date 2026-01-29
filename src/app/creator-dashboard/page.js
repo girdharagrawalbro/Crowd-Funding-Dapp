@@ -190,6 +190,12 @@ export default function CreatorDashboard () {
 
   const handleWithdraw = async campaignId => {
     try {
+      if (USE_MOCK_DATA) {
+        // Simulate withdrawal for mock data
+        toast.success('Funds withdrawn successfully! (Demo Mode)')
+        return
+      }
+      
       // Test call to simulate withdrawal and catch errors
       const tx = await contract.withdrawFunds(campaignId)
       await tx.wait()
