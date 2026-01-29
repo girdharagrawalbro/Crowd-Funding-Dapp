@@ -1,5 +1,31 @@
+// Network configuration - switch between local and Sepolia
+// For LOCAL testing: Run `npx hardhat node` then `npx hardhat run scripts/deploy.js --network localhost`
+// Then update LOCAL_CONTRACT_ADDRESS with the deployed address
 
-export const contractAddress = "0x620514B177a874E1260416a23a95C38bf75542cd";
+const NETWORK_MODE = process.env.NEXT_PUBLIC_NETWORK_MODE || "local"; // "local" or "sepolia"
+
+const SEPOLIA_CONTRACT_ADDRESS = "0x620514B177a874E1260416a23a95C38bf75542cd";
+const LOCAL_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Default Hardhat deploy address
+
+export const contractAddress = NETWORK_MODE === "sepolia" 
+    ? SEPOLIA_CONTRACT_ADDRESS 
+    : LOCAL_CONTRACT_ADDRESS;
+
+export const networkConfig = {
+    local: {
+        chainId: 31337,
+        name: "Hardhat Local",
+        rpcUrl: "http://127.0.0.1:8545"
+    },
+    sepolia: {
+        chainId: 11155111,
+        name: "Sepolia Testnet",
+        rpcUrl: "https://sepolia.infura.io/v3/YOUR_INFURA_KEY"
+    }
+};
+
+export const currentNetwork = networkConfig[NETWORK_MODE];
+
 export const contractABI =
     [
         {

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchCampaigns } from "./lib/blockchain";
+import { USE_MOCK_DATA, getAllMockCampaigns } from "./lib/mockData";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -19,6 +20,12 @@ export default function Home() {
     setMounted(true);
     const loadCampaigns = async () => {
       try {
+        if (USE_MOCK_DATA) {
+          // Use mock data for screenshots/demo (includes newly created campaigns)
+          setCampaigns(getAllMockCampaigns());
+          setLoading(false);
+          return;
+        }
         const data = await fetchCampaigns();
         setCampaigns(data);
         setLoading(false);

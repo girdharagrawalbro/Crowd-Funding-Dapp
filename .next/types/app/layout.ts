@@ -1,4 +1,4 @@
-// File: D:\Crowdfunding\crowdfunding-dapp\src\app\layout.js
+// File: D:\PROJECTS\MCA Class Project\Crowdfunding\crowdfunding-dapp\src\app\layout.js
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

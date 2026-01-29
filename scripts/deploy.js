@@ -19,11 +19,22 @@
 const hre = require("hardhat");
 
 async function main() {
+  console.log("🚀 Deploying Crowdfunding contract...");
+  console.log(`📡 Network: ${hre.network.name}`);
+  
   const Crowdfunding = await hre.ethers.getContractFactory("Crowdfunding");
   const crowdfunding = await Crowdfunding.deploy();
-  await crowdfunding.deployed();
-
-  console.log("Crowdfunding deployed to:", crowdfunding.address);
+  
+  // Wait for deployment (works with newer ethers versions)
+  await crowdfunding.waitForDeployment();
+  
+  const address = await crowdfunding.getAddress();
+  
+  console.log("\n✅ Crowdfunding deployed to:", address);
+  console.log("\n📋 Next steps:");
+  console.log(`   1. Update LOCAL_CONTRACT_ADDRESS in src/app/lib/constants.js to: "${address}"`);
+  console.log("   2. Make sure NEXT_PUBLIC_NETWORK_MODE=local in .env.local");
+  console.log("   3. Add Hardhat network to MetaMask (Chain ID: 31337, RPC: http://127.0.0.1:8545)");
 }
 
 main().catch((error) => {

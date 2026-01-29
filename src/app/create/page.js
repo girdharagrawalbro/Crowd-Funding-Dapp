@@ -2,13 +2,16 @@
 import { useState } from "react";
 import { ethers } from "ethers";
 import { contractAddress, contractABI } from "../lib/constants";
+import { USE_MOCK_DATA, createMockCampaign, mockAccount } from "../lib/mockData";
 import toast from 'react-hot-toast';
 import Circle from "../components/Circle";
 import { useDispatch } from 'react-redux';
 import { createEvent } from '../store/slices/eventSlice';
+import { useAccount } from 'wagmi';
 
 export default function CreateCampaign() {
     const dispatch = useDispatch();
+    const { address } = useAccount();
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -26,27 +29,73 @@ export default function CreateCampaign() {
         setIsSubmitting(true);
 
         try {
-            // Mock blockchain data for testing
-            const mockBlockchainId = "123"; // Mock campaign ID
             const goalEth = parseFloat(form.goal);
             const deadlineDate = new Date(form.deadline);
+            let campaignId;
+            let txHash;
 
-            // Send to MongoDB API
-            const response = await fetch("/api/events", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    blockchainId: mockBlockchainId,
+            if (USE_MOCK_DATA) {
+                // Use mock data for demo
+                const ownerAddress = address || mockAccount;
+                const result = await createMockCampaign({
+                    owner: ownerAddress,
                     title: form.title,
                     description: form.description,
                     goal: goalEth,
                     deadline: deadlineDate,
-                    amountCollected: 0,
-                    isWithdrawn: false
-                }),
-            });
+                });
+                campaignId = result.campaign.id.toString();
+                txHash = result.txHash;
+                console.log("Mock campaign created:", result.campaign);
+            } else {
+                // Real blockchain transaction
+                if (!window.ethereum) {
+                    throw new Error("Please install MetaMask to create campaigns");
+                }
+                
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const signer = await provider.getSigner();
+                const contract = new ethers.Contract(contractAddress, contractABI, signer);
+                
+                const deadlineTimestamp = Math.floor(deadlineDate.getTime() / 1000);
+                const tx = await contract.createCampaign(
+                    form.title,
+                    form.description,
+                    ethers.parseEther(form.goal),
+                    deadlineTimestamp
+                );
+                
+                const receipt = await tx.wait();
+                txHash = receipt.hash;
+                
+                // Get campaign count to determine new campaign ID
+                const campaignCount = await contract.campaignCount();
+                campaignId = (campaignCount - 1n).toString();
+            }
 
-            const campaignData = await response.json();
+            // Send to MongoDB API (optional - will fail gracefully if DB not set up)
+            try {
+                const response = await fetch("/api/events", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        blockchainId: campaignId,
+                        title: form.title,
+                        description: form.description,
+                        goal: goalEth,
+                        deadline: deadlineDate,
+                        amountCollected: 0,
+                        isWithdrawn: false
+                    }),
+                });
+                
+                if (response.ok) {
+                    const campaignData = await response.json();
+                    console.log("Campaign saved to database:", campaignData);
+                }
+            } catch (dbError) {
+                console.log("Database save skipped (API may not be configured)");
+            }
 
             // Dispatch createEvent action
             dispatch(createEvent({
@@ -55,7 +104,7 @@ export default function CreateCampaign() {
                 endDate: deadlineDate,
                 goal: goalEth,
                 status: 'active',
-                blockchainId: mockBlockchainId
+                blockchainId: campaignId
             }));
 
             toast.success("Campaign Created Successfully!");
