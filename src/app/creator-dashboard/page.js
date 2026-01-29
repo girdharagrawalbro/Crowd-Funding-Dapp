@@ -7,6 +7,7 @@ import DonorModal from '../components/DonorModal'
 import toast from 'react-hot-toast'
 import { contractABI, contractAddress } from '../lib/constants'
 import { updateUserName } from '../store/slices/userSlice'
+import { USE_MOCK_DATA, getMockCampaignsByOwner, mockAccount, getMockDonors } from '../lib/mockData'
 
 export default function CreatorDashboard () {
   const dispatch = useDispatch()
@@ -65,6 +66,40 @@ export default function CreatorDashboard () {
   }
 
   const fetchCreatorCampaigns = useCallback(async () => {
+    // Use mock data if enabled
+    if (USE_MOCK_DATA) {
+      const ownerAddress = walletAddress || mockAccount;
+      const creatorCampaigns = getMockCampaignsByOwner(ownerAddress).map(c => ({
+        ...c,
+        goal: parseFloat(c.goal),
+        deadline: new Date(c.deadline * 1000),
+        amountCollected: parseFloat(c.amountCollected)
+      }));
+
+      let totalRaised = 0;
+      let active = 0;
+      let successful = 0;
+
+      creatorCampaigns.forEach(campaign => {
+        totalRaised += campaign.amountCollected;
+        if (new Date() < campaign.deadline) {
+          active++;
+        }
+        if (campaign.amountCollected >= campaign.goal) {
+          successful++;
+        }
+      });
+
+      setCampaigns(creatorCampaigns);
+      setStats({
+        totalCampaigns: creatorCampaigns.length,
+        totalRaised,
+        activeCampaigns: active,
+        successfulCampaigns: successful
+      });
+      return;
+    }
+
     if (!contract || !walletAddress) return
 
     try {
@@ -117,6 +152,12 @@ export default function CreatorDashboard () {
   }, [contract, walletAddress])
 
   useEffect(() => {
+    // For mock data, fetch immediately without needing a wallet connection
+    if (USE_MOCK_DATA) {
+      fetchCreatorCampaigns()
+      return
+    }
+
     if (!walletAddress) return
 
     const initializeContract = async () => {
@@ -137,9 +178,11 @@ export default function CreatorDashboard () {
     }
 
     initializeContract()
-  }, [walletAddress])
+  }, [walletAddress, fetchCreatorCampaigns])
 
   useEffect(() => {
+    if (USE_MOCK_DATA) return // Already handled above
+    
     if (contract && walletAddress) {
       fetchCreatorCampaigns()
     }
