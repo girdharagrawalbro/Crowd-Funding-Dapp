@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crowdfunding DApp - Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+        
+        .slide {
+            width: 100%;
+            min-height: 100vh;
+            padding: 60px 80px;
+            display: flex;
+            flex-direction: column;
+            page-break-after: always;
+            position: relative;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+        
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-radius: 0 0 0 100%;
+            opacity: 0.2;
+        }
+        
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 18px;
+            color: #16a34a;
+            font-weight: bold;
+        }
+        
+        h1 {
+            font-size: 52px;
+            color: #16a34a;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        h2 {
+            font-size: 38px;
+            color: #16a34a;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #22c55e;
+            padding-bottom: 15px;
+        }
+        
+        h3 {
+            font-size: 26px;
+            color: #15803d;
+            margin: 20px 0 15px 0;
+        }
+        
+        p {
+            font-size: 22px;
+            line-height: 1.8;
+            color: #374151;
+        }
+        
+        ul {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        ul li {
+            font-size: 22px;
+            padding: 12px 0;
+            padding-left: 40px;
+            position: relative;
+            color: #374151;
+        }
+        
+        ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-size: 24px;
+        }
+        
+        .title-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .title-slide h1 {
+            font-size: 64px;
+            margin-bottom: 30px;
+        }
+        
+        .title-slide .subtitle {
+            font-size: 28px;
+            color: #15803d;
+            margin-bottom: 40px;
+        }
+        
+        .title-slide .tech-stack {
+            display: flex;
+            gap: 30px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .tech-badge {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 18px;
+            border: 2px solid #15803d;
+            color: #ffffff;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 30px;
+        }
+        
+        .card {
+            background: rgba(220, 252, 231, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .card h3 {
+            margin-top: 0;
+        }
+        
+        /* Flow Diagram Styles */
+        .flow-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px auto;
+            max-width: 900px;
+        }
+        
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin: 5px 0;
+        }
+        
+        .flow-box {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            padding: 20px 35px;
+            border-radius: 12px;
+            border: 2px solid #22c55e;
+            text-align: center;
+            min-width: 180px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #166534;
+        }
+        
+        .flow-box.user {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-color: #15803d;
+            color: #ffffff;
+        }
+        
+        .flow-box.frontend {
+            background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+            border-color: #22c55e;
+            color: #166534;
+        }
+        
+        .flow-box.blockchain {
+            background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+            border-color: #eab308;
+            color: #713f12;
+        }
+        
+        .flow-box.database {
+            background: linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%);
+            border-color: #10b981;
+            color: #065f46;
+        }
+        
+        .arrow {
+            font-size: 30px;
+            color: #16a34a;
+        }
+        
+        .arrow-down {
+            font-size: 20px;
+            color: #16a34a;
+            margin: 2px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .feature-box {
+            background: rgba(220, 252, 231, 0.8);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            border-top: 4px solid #22c55e;
+        }
+        
+        .feature-box .icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-box h4 {
+            color: #15803d;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .feature-box p {
+            font-size: 16px;
+        }
+        
+        .tech-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+        
+        .tech-table th, .tech-table td {
+            padding: 18px 25px;
+            text-align: left;
+            border-bottom: 1px solid #dcfce7;
+        }
+        
+        .tech-table th {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            font-size: 20px;
+        }
+        
+        .tech-table td {
+            font-size: 18px;
+            color: #374151;
+        }
+        
+        .tech-table tr:nth-child(even) {
+            background: rgba(220, 252, 231, 0.5);
+        }
+        
+        .conclusion-points {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .conclusion-card {
+            flex: 1;
+            background: rgba(220, 252, 231, 0.7);
+            padding: 35px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .conclusion-card:nth-child(1) {
+            border-color: #22c55e;
+        }
+        
+        .conclusion-card:nth-child(2) {
+            border-color: #16a34a;
+        }
+        
+        .conclusion-card:nth-child(3) {
+            border-color: #15803d;
+        }
+        
+        .conclusion-card .icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .conclusion-card h3 {
+            margin-top: 0;
+        }
+        
+        @media print {
+            .slide {
+                page-break-after: always;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Title Slide -->
+    <div class="slide title-slide">
+        <h1>Crowdfunding DApp</h1>
+        <p class="subtitle">A Decentralized Crowdfunding Platform Built on Ethereum Blockchain</p>
+        <p style="font-size: 24px; margin-top: 20px;">MCA 3rd Sem Mini Project</p>
+        <p style="font-size: 16px; margin-top: 20px;">Submitted By</p>
+        <p style="font-size: 24px; margin-top: 10px;">Girdhar Agrawal, Sudhanshu Sharma, Aditya Yadav</p>
+        
+        <!-- <div class="tech-stack"> -->
+            <!-- <span class="tech-badge">Next.js 15</span>
+            <span class="tech-badge">Solidity</span>
+            <span class="tech-badge">Ethereum</span>
+            <span class="tech-badge">Ethers.js</span>
+            <span class="tech-badge">Hardhat</span>
+            <span class="tech-badge">Tailwind CSS</span>
+        </div> -->
+        <div class="slide-number">1 / 6</div>
+    </div>
+
+    <!-- Slide 2: Introduction & Problem Statement -->
+    <div class="slide">
+        <h2>📌 Introduction & Problem Statement</h2>
+        
+        <div class="content-grid">
+            <div class="card">
+                <h3>🎯 Problem Statement</h3>
+                <ul>
+                    <li>Traditional crowdfunding platforms charge high fees (5-10%)</li>
+                    <li>Lack of transparency in fund utilization</li>
+                    <li>Centralized control over funds</li>
+                    <li>Geographical restrictions on donations</li>
+                    <li>Risk of fraud and misuse of funds</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3>💡 Our Solution</h3>
+                <ul>
+                    <li>Decentralized platform with no intermediaries</li>
+                    <li>Complete transparency via blockchain</li>
+                    <li>Smart contracts ensure trustless transactions</li>
+                    <li>Global access with cryptocurrency</li>
+                    <li>Automated refunds if goals aren't met</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- <h3 style="margin-top: 40px;">🎯 Project Objectives</h3>
+        <ul>
+            <li>Create a secure, transparent crowdfunding platform using Ethereum blockchain</li>
+            <li>Enable campaign creators to raise funds globally without intermediaries</li>
+            <li>Ensure donor protection through smart contract-based refund mechanism</li>
+        </ul> -->
+        
+        <div class="slide-number">2 / 6</div>
+    </div>
+
+    <!-- Slide 3: System Architecture & Flow Diagram -->
+    <div class="slide">
+        <h2>🏗️ System Architecture & Flow Diagram</h2>
+        
+        <div class="flow-diagram">
+            <!-- Row 1: User -->
+            <div class="flow-row">
+                <div class="flow-box user">👤 USER<br><small>(Creator / Donor)</small></div>
+            </div>
+            
+            <div class="arrow-down">⬇️</div>
+            
+            <!-- Row 2: Frontend -->
+            <div class="flow-row">
+                <div class="flow-box frontend">🌐 NEXT.JS FRONTEND<br><small>(React + Tailwind CSS)</small></div>
+            </div>
+            
+            <div class="arrow-down">⬇️</div>
+            
+            <!-- Row 3: Wallet -->
+            <div class="flow-row">
+                <div class="flow-box" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border-color: #c2410c; color: white;">🦊 METAMASK WALLET<br><small>(Web3 Provider)</small></div>
+            </div>
+            
+            <div class="arrow-down">⬇️</div>
+            
+            <!-- Row 4: Ethers.js -->
+            <div class="flow-row">
+                <div class="flow-box">📦 ETHERS.JS<br><small>(Blockchain Interaction)</small></div>
+            </div>
+            
+            <div class="arrow-down">⬇️</div>
+            
+            <!-- Row 5: Smart Contract & Blockchain -->
+            <div class="flow-row">
+                <div class="flow-box blockchain">📜 SMART CONTRACT<br><small>(Crowdfunding.sol)</small></div>
+                <span class="arrow">⟷</span>
+                <div class="flow-box blockchain">⛓️ ETHEREUM BLOCKCHAIN<br><small>(Sepolia Testnet)</small></div>
+            </div>
+            
+            <!-- <div class="arrow-down">⬇️</div> -->
+            
+           
+        </div>
+        
+        <div class="slide-number">3 / 6</div>
+    </div>
+
+    <!-- Slide 4: Key Features -->
+    <div class="slide">
+        <h2>⚡ Key Features</h2>
+        
+        <div class="features-grid">
+            <div class="feature-box">
+                <div class="icon">📝</div>
+                <h4>Create Campaigns</h4>
+                <p>Create fundraising campaigns with title, description, goal & deadline</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="icon">💰</div>
+                <h4>Donate with ETH</h4>
+                <p>Donate to campaigns using Ethereum cryptocurrency securely</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="icon">✏️</div>
+                <h4>Update Campaigns</h4>
+                <p>Edit campaign details before receiving any donations</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="icon">💸</div>
+                <h4>Automatic Refunds</h4>
+                <p>If goal not met by deadline, donors can claim automatic refunds</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="icon">📊</div>
+                <h4>Creator Dashboard</h4>
+                <p>Campaign owners can track donations and withdraw successful funds</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="icon">👥</div>
+                <h4>Donor Tracking</h4>
+                <p>View all donors and their contribution amounts transparently</p>
+            </div>
+            
+            
+        </div>
+        
+        <div class="slide-number">4 / 6</div>
+    </div>
+
+    <!-- Slide 5: Technology Stack -->
+    <div class="slide">
+        <h2>🛠️ Technology Stack</h2>
+        
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Technology</th>
+                    <th>Purpose</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Frontend</strong></td>
+                    <td>Next.js 15, React 19</td>
+                    <td>Modern web application framework with SSR</td>
+                </tr>
+                <tr>
+                    <td><strong>Styling</strong></td>
+                    <td>Tailwind CSS 4</td>
+                    <td>Utility-first CSS for responsive design</td>
+                </tr>
+                <tr>
+                    <td><strong>Smart Contract</strong></td>
+                    <td>Solidity ^0.8.28</td>
+                    <td>Ethereum smart contract programming</td>
+                </tr>
+                <tr>
+                    <td><strong>Blockchain</strong></td>
+                    <td>Ethereum (Sepolia)</td>
+                    <td>Decentralized network for transactions</td>
+                </tr>
+                <tr>
+                    <td><strong>Web3 Library</strong></td>
+                    <td>Ethers.js 6</td>
+                    <td>Interact with Ethereum blockchain</td>
+                </tr>
+                <tr>
+                    <td><strong>Development</strong></td>
+                    <td>Hardhat</td>
+                    <td>Smart contract testing & deployment</td>
+                </tr>
+                <tr>
+                    <td><strong>State Management</strong></td>
+                    <td>Redux Toolkit</td>
+                    <td>Centralized state management</td>
+                </tr>
+                <tr>
+                    <td><strong>Database</strong></td>
+                    <td>Prisma + PostgreSQL</td>
+                    <td>Off-chain data storage</td>
+                </tr>
+                <tr>
+                    <td><strong>Wallet</strong></td>
+                    <td>MetaMask</td>
+                    <td>Browser wallet for transactions</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="slide-number">5 / 6</div>
+    </div>
+
+    <!-- Slide 6: Conclusion & Future Scope -->
+    <div class="slide">
+        <h2>🎯 Future Scope</h2>
+        
+        <!-- <div class="conclusion-points">
+            <div class="conclusion-card">
+                <div class="icon">✅</div>
+                <h3>What We Built</h3>
+                <p>A fully functional decentralized crowdfunding platform with transparent fund management, secure smart contracts, and user-friendly interface.</p>
+            </div>
+            
+            <div class="conclusion-card">
+                <div class="icon">🚀</div>
+                <h3>Key Benefits</h3>
+                <p>Zero intermediary fees, global accessibility, automated refunds, complete transparency, and trustless transactions via blockchain.</p>
+            </div>
+            
+            <div class="conclusion-card">
+                <div class="icon">🔮</div>
+                <h3>Future Scope</h3>
+                <p>Multi-chain support, NFT rewards for donors, social sharing, milestone-based funding, and mobile application.</p>
+            </div>
+        </div> -->
+        
+        <!-- <h3 style="margin-top: 50px;">📈 Future Enhancements</h3> -->
+        <ul>
+            <li><strong>Multi-chain Support:</strong> Deploy on Polygon, BSC, and other EVM chains for lower fees</li>
+            <li><strong>NFT Rewards:</strong> Issue NFT certificates to donors as proof of contribution</li>
+            <li><strong>Milestone Funding:</strong> Release funds in phases based on project milestones</li>
+            <li><strong>DAO Governance:</strong> Community voting on featured campaigns</li>
+            <li><strong>Mobile App:</strong> Native iOS/Android application with wallet integration</li>
+        </ul>
+        
+        <div style="text-align: center; margin-top: 60px;">
+            <p style="font-size: 28px; color: #16a34a;">🙏 Thank You!</p>
+            <p style="font-size: 18px; color: #15803d; margin-top: 10px;">Questions & Discussion</p>
+        </div>
+        
+        <div class="slide-number">6 / 6</div>
+    </div>
+
+</body>
+</html>
