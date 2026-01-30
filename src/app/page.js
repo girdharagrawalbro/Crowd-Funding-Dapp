@@ -5,7 +5,6 @@ import { USE_MOCK_DATA, getAllMockCampaigns } from "./lib/mockData";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-import { prisma } from './lib/prisma';
 
 export default function Home() {
   const [campaigns, setCampaigns] = useState([]);
