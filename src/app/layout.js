@@ -26,7 +26,7 @@ const balooBhaijaan2 = Baloo_Bhaijaan_2({
 export default function RootLayout({ children }) {
 
   return (
-    <html lang="en" className={`${inter.className} ${balooBhai2.variable} ${balooBhaijaan2.variable}`} suppressHydrationWarning >
+    <html lang="en" className={`${inter.className} ${balooBhai2.variable} ${balooBhaijaan2.variable}`} suppressHydrationWarning>
       <head>
         <link rel="shortcut icon" href="logo.png" type="image/x-icon" />
       </head>

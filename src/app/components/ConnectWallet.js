@@ -13,6 +13,11 @@ const ConnectWallet = ({ mobile = false }) => {
   const { walletAddress, balance } = useSelector((state) => state.account);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const disconnectWallet = useCallback(() => {
+    dispatch(disconnectAccount());
+    toast.error("Wallet Changed!");
+    setIsMenuOpen(false);
+  }, [dispatch]);
 
   useEffect(() => {
     if (window.ethereum) {
@@ -20,7 +25,7 @@ const ConnectWallet = ({ mobile = false }) => {
         disconnectWallet();
       });
     }
-  }, []);
+  }, [disconnectWallet]);
 
   const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -110,12 +115,6 @@ const ConnectWallet = ({ mobile = false }) => {
       }
     }
   };
-
-  const disconnectWallet = useCallback(() => {
-    dispatch(disconnectAccount());
-    toast.error("Wallet Changed!");
-    setIsMenuOpen(false);
-  }, [dispatch]);
 
   return (
     <>
