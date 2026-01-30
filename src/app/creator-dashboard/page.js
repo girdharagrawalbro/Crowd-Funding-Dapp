@@ -293,7 +293,7 @@ export default function CreatorDashboard () {
 
       <h2 className='text-2xl font-semibold mb-4'>Your Campaigns</h2>
       {campaigns.length === 0 ? (
-        <p className='text-gray-600'>You haven't created any campaigns yet.</p>
+        <p className='text-gray-600'>You haven&apos;t created any campaigns yet.</p>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {campaigns.map(campaign => (

@@ -1,17 +1,26 @@
-import { connectDB } from "@/lib/mongodb";
-import Donation from "@/models/Donation";
-import Campaign from "@/models/Campaign";
+import prisma from "@/lib/prisma";
 
 export async function POST(req) {
-  await connectDB();
-  const { campaignId, donorId, amount } = await req.json();
+  const { eventId, userId, amount } = await req.json();
 
   try {
-    const donation = await Donation.create({ campaign: campaignId, donor: donorId, amount });
+    // Create the donation
+    const donation = await prisma.donation.create({
+      data: {
+        eventId: parseInt(eventId),
+        userId: parseInt(userId),
+        donationAmount: parseFloat(amount),
+      },
+    });
 
-    await Campaign.findByIdAndUpdate(campaignId, {
-      $inc: { currentAmount: amount },
-      $push: { donations: donation._id }
+    // Update the event's current donation amount
+    await prisma.event.update({
+      where: { id: parseInt(eventId) },
+      data: {
+        currentDonation: {
+          increment: parseFloat(amount),
+        },
+      },
     });
 
     return Response.json({ success: true, donation });

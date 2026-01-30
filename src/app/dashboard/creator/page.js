@@ -3,19 +3,19 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchEventsByUser } from '@/app/store/slices/eventSlice'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
 export default function CreatorDashboard() {
   const dispatch = useDispatch()
-  const { data: session } = useSession()
+  const { walletAddress } = useSelector((state) => state.account)
+  const { user } = useSelector((state) => state.user)
   const { events, status, error } = useSelector((state) => state.events)
 
   useEffect(() => {
-    if (session?.user?.id) {
-      dispatch(fetchEventsByUser(session.user.id))
+    if (user?.id) {
+      dispatch(fetchEventsByUser(user.id))
     }
-  }, [dispatch, session?.user?.id])
+  }, [dispatch, user?.id])
 
   if (status === 'loading') {
     return (
@@ -47,7 +47,7 @@ export default function CreatorDashboard() {
 
       {events.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">You haven't created any events yet.</p>
+          <p className="text-gray-500 text-lg">You haven&apos;t created any events yet.</p>
           <Link
             href="/dashboard/creator/create"
             className="text-blue-500 hover:text-blue-600 mt-4 inline-block"
