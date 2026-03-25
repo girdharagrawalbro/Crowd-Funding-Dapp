@@ -93,41 +93,20 @@ export default function CreateCampaign() {
                 campaignId = (campaignCount - 1n).toString();
             }
 
-            // Send to MongoDB API (optional - will fail gracefully if DB not set up)
-            try {
-                const response = await fetch("/api/events", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        blockchainId: campaignId,
-                        title: form.title,
-                        description: form.description,
-                        goal: goalEth,
-                        deadline: deadlineDate,
-                        amountCollected: 0,
-                        isWithdrawn: false
-                    }),
-                });
-                
-                if (response.ok) {
-                    const campaignData = await response.json();
-                    console.log("Campaign saved to database:", campaignData);
-                }
-            } catch (dbError) {
-                console.log("Database save skipped (API may not be configured)");
-            }
-
-            // Dispatch createEvent action
-            dispatch(createEvent({
+            await dispatch(createEvent({
+                blockchainId: campaignId,
                 title: form.title,
-                desc: form.description,
-                endDate: deadlineDate,
+                description: form.description,
                 goal: goalEth,
-                status: 'active',
-                blockchainId: campaignId
-            }));
+                deadline: deadlineDate,
+                amountCollected: 0,
+                isWithdrawn: false,
+                ownerWallet: account || mockAccount,
+                createTxHash: txHash,
+                network: process.env.NEXT_PUBLIC_NETWORK_MODE || 'local',
+            })).unwrap();
 
-            toast.success("Campaign Created Successfully!");
+            toast.success("Campaign created and submitted for admin approval!");
             setForm({
                 title: "",
                 description: "",

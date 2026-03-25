@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { fetchCampaigns } from "./lib/blockchain";
 import { USE_MOCK_DATA, getAllMockCampaigns } from "./lib/mockData";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+
+const ITEMS_PER_PAGE = 5;
 
 export default function Home() {
   const [campaigns, setCampaigns] = useState([]);
@@ -13,6 +14,20 @@ export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [trandingfilteredCampaigns, settrandingFilteredCampaigns] = useState([]);
+
+  const normalizeCampaign = (campaign) => {
+    const deadlineDate = new Date(campaign.deadline);
+    const goal = Number(campaign.goal || 0);
+    const amountCollected = Number(campaign.amountCollected || 0);
+
+    return {
+      ...campaign,
+      goal,
+      amountCollected,
+      deadlineDate,
+      deadlineTs: Math.floor(deadlineDate.getTime() / 1000),
+    };
+  };
 
   
   useEffect(() => {
@@ -25,8 +40,11 @@ export default function Home() {
           setLoading(false);
           return;
         }
-        const data = await fetchCampaigns();
-        setCampaigns(data);
+        const res = await fetch('/api/events');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load campaigns');
+
+        setCampaigns(data.map(normalizeCampaign));
         setLoading(false);
       } catch (error) {
         console.error("Error loading campaigns:", error);
@@ -42,7 +60,7 @@ export default function Home() {
     if (campaigns.length > 0) {
       const now = Math.floor(Date.now() / 1000); // Current timestamp in seconds
       const filtered = campaigns.filter(campaign =>
-        campaign.deadline > now // Only show active campaigns
+        (campaign.deadlineTs || campaign.deadline) > now // Only show active campaigns
       );
       setFilteredCampaigns(filtered);
     }
@@ -54,26 +72,25 @@ export default function Home() {
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const activeCampaigns = campaigns.filter(campaign => {
-      const campaignDeadline = new Date(campaign.deadline);
+      const campaignDeadline = campaign.deadlineDate || new Date(campaign.deadline);
       const deadlineDate = new Date(campaignDeadline.getFullYear(), campaignDeadline.getMonth(), campaignDeadline.getDate());
       return deadlineDate >= startOfToday;
     });
-    // Sort campaigns by date added (assuming each campaign has a `dateAdded` field)  
-    const sortedCampaigns = activeCampaigns.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+    const sortedCampaigns = activeCampaigns.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
     settrandingFilteredCampaigns(sortedCampaigns);
   }, [campaigns]);
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 5) % trandingfilteredCampaigns.length);
+    setCurrentIndex((prevIndex) => (prevIndex + ITEMS_PER_PAGE) % trandingfilteredCampaigns.length);
   };
 
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 5 + trandingfilteredCampaigns.length) % trandingfilteredCampaigns.length);
+    setCurrentIndex((prevIndex) => (prevIndex - ITEMS_PER_PAGE + trandingfilteredCampaigns.length) % trandingfilteredCampaigns.length);
   };
   if (loading) return <div>Loading...</div>;
 
-  const visibleCampaigns = trandingfilteredCampaigns.slice(currentIndex, currentIndex + 5);
+  const visibleCampaigns = trandingfilteredCampaigns.slice(currentIndex, currentIndex + ITEMS_PER_PAGE);
   if (loading) {
     return (
       <div className="flex h-96 justify-center items-center py-60">
@@ -257,8 +274,8 @@ export default function Home() {
               </button>
               <button
                 onClick={handleNext}
-                disabled={currentIndex >= campaigns.length - itemsPerPage}
-                className={`bg-green-600 text-white font-bold py-1 md:py-2 px-3 rounded-full ${currentIndex >= campaigns.length - itemsPerPage ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
+                disabled={currentIndex >= campaigns.length - ITEMS_PER_PAGE}
+                className={`bg-green-600 text-white font-bold py-1 md:py-2 px-3 rounded-full ${currentIndex >= campaigns.length - ITEMS_PER_PAGE ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
               >
                 {">"}
               </button>
@@ -294,7 +311,7 @@ export default function Home() {
               filteredCampaigns.map((campaign, index) => {
                 const progress = (campaign.amountCollected / campaign.goal) * 100;
                 const isGoalMet = campaign.amountCollected >= campaign.goal;
-                const deadlineDate = new Date(campaign.deadline * 1000);
+                const deadlineDate = campaign.deadlineDate || new Date(campaign.deadline);
 
                 return (
                   <div

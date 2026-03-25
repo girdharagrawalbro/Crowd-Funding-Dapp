@@ -9,6 +9,9 @@ import Providers from "./providers"; // Import Providers
 export const metadata = {
   title: "Crowd Funding Campaigns",
   description: "",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 const inter = Inter({ subsets: ['latin'] })
@@ -27,19 +30,17 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en" className={`${inter.className} ${balooBhai2.variable} ${balooBhaijaan2.variable}`} suppressHydrationWarning>
-      <head>
-        <link rel="shortcut icon" href="logo.png" type="image/x-icon" />
-      </head>
       <body>
         <Providers>
-            <Header />
-            {children}
-            <Toaster
-              position="top-center"
-              reverseOrder={false}
-            />
-            <Footer />
-        </Providers></body>
+          <Header />
+          {children}
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+          />
+          <Footer />
+        </Providers>
+      </body>
     </html>
   );
 }

@@ -106,6 +106,18 @@ export default function CampaignDetails() {
       } else {
         const result = await donateToCampaign(id, donation);
         if (result.success) {
+          await fetch("/api/donations/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              campaignId: id,
+              donorWallet: account,
+              amount: donation,
+              txHash: result.txHash,
+              network: process.env.NEXT_PUBLIC_NETWORK_MODE || "local",
+            }),
+          });
+
           toast.success("Donation successful!");
           const updatedCampaign = await fetchCampaign(id);
           setCampaign(updatedCampaign);

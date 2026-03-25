@@ -42,8 +42,8 @@ export const donateToCampaign = async (campaignId, amount) => {
   try {
     const contract = await getEthereumContract();
     const tx = await contract.donateToCampaign(campaignId, { value: ethers.parseEther(amount) });
-    await tx.wait();
-    return { success: true };
+    const receipt = await tx.wait();
+    return { success: true, txHash: receipt?.hash || tx.hash };
   } catch (error) {
     console.error("Error donating:", error);
     return { success: false, message: error.reason };

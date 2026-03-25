@@ -186,6 +186,14 @@ const ConnectWallet = ({ mobile = false }) => {
                   My Donations
                 </Link>
 
+                <Link
+                  href="/admin"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Admin Review
+                </Link>
+
                 {/* Disconnect */}
                 <button
                   onClick={disconnectWallet}

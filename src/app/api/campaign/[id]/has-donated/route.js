@@ -3,26 +3,27 @@ import { connectToDatabase } from "@/lib/mongodb";
 import Donation from "@/lib/models/Donation";
 import { normalizeWallet } from "@/lib/admin";
 
-export async function GET(req) {
+export async function GET(req, { params }) {
   try {
     await connectToDatabase();
-    const { searchParams } = new URL(req.url);
-    const campaignId = String(searchParams.get("campaignId") || "").trim();
-    const donorId = normalizeWallet(searchParams.get("donorId") || searchParams.get("account") || "");
 
-    if (!campaignId || !donorId) {
-      return NextResponse.json({ hasDonated: false });
+    const { searchParams } = new URL(req.url);
+    const account = normalizeWallet(searchParams.get("account") || "");
+    const campaignId = String(params.id || "").trim();
+
+    if (!account) {
+      return NextResponse.json({ hasDonated: false }, { status: 200 });
     }
 
     const existing = await Donation.findOne({
       campaignBlockchainId: campaignId,
-      donorWallet: donorId,
+      donorWallet: account,
     })
       .select("_id")
       .lean();
 
     return NextResponse.json({ hasDonated: Boolean(existing) });
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error.message || "Failed to check donation" }, { status: 500 });
   }
 }

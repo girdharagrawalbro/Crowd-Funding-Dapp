@@ -1,30 +1,19 @@
-import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+import { createDonationRecord } from "@/app/api/donations/utils";
 
 export async function POST(req) {
-  const { eventId, userId, amount } = await req.json();
-
   try {
-    // Create the donation
-    const donation = await prisma.donation.create({
-      data: {
-        eventId: parseInt(eventId),
-        userId: parseInt(userId),
-        donationAmount: parseFloat(amount),
-      },
-    });
+    await connectToDatabase();
+    const payload = await req.json();
+    const result = await createDonationRecord(payload);
 
-    // Update the event's current donation amount
-    await prisma.event.update({
-      where: { id: parseInt(eventId) },
-      data: {
-        currentDonation: {
-          increment: parseFloat(amount),
-        },
-      },
-    });
+    if (result.error) {
+      return NextResponse.json({ success: false, error: result.error }, { status: result.status || 400 });
+    }
 
-    return Response.json({ success: true, donation });
+    return NextResponse.json({ success: true, donation: result.donation }, { status: result.status || 201 });
   } catch (err) {
-    return Response.json({ success: false, error: err.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }

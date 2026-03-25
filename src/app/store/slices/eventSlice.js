@@ -154,7 +154,8 @@ const eventSlice = createSlice({
                 state.donations.push(action.payload)
                 // Update current event's donation amount if it exists
                 if (state.currentEvent) {
-                    state.currentEvent.currentDonation += action.payload.donationAmount
+                    const donatedAmount = Number(action.payload.donationAmount ?? action.payload.amountEth ?? 0)
+                    state.currentEvent.currentDonation += donatedAmount
                 }
             })
             .addCase(createDonation.rejected, (state, action) => {
