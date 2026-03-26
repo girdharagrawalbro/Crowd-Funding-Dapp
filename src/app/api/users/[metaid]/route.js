@@ -2,14 +2,13 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/lib/models/User";
 import { toUserDTO } from "@/lib/dto";
-import { normalizeWallet } from "@/lib/admin";
 
 export async function GET(_req, { params }) {
   try {
     await connectToDatabase();
 
-    const metaid = normalizeWallet(params.metaid);
-    const user = await User.findOne({ metaid });
+    const userId = params.userId;
+    const user = await User.findOne({ userId });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -32,9 +31,9 @@ export async function PATCH(req, { params }) {
 
     await connectToDatabase();
 
-    const metaid = normalizeWallet(params.metaid);
+    const userId = params.userId;
     const user = await User.findOneAndUpdate(
-      { metaid },
+      { userId },
       { $set: { name } },
       { new: true }
     );

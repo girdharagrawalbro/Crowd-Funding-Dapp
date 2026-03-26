@@ -8,37 +8,21 @@ const DonationSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    campaignBlockchainId: {
+    donorId: {
       type: String,
       required: true,
-      index: true,
-    },
-    donorWallet: {
-      type: String,
-      required: true,
-      lowercase: true,
       trim: true,
       index: true,
     },
-    amountEth: {
+    donorName: {
+      type: String,
+      default: "Anonymous",
+      trim: true,
+    },
+    amount: {
       type: Number,
       required: true,
       min: 0,
-    },
-    txHash: {
-      type: String,
-      index: true,
-      sparse: true,
-      unique: true,
-    },
-    network: {
-      type: String,
-      default: process.env.NEXT_PUBLIC_NETWORK_MODE || "local",
-    },
-    status: {
-      type: String,
-      enum: ["confirmed", "pending", "failed"],
-      default: "confirmed",
     },
     donatedAt: {
       type: Date,
@@ -48,6 +32,6 @@ const DonationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-DonationSchema.index({ campaignBlockchainId: 1, donorWallet: 1 });
+DonationSchema.index({ campaign: 1, donorId: 1 });
 
 export default mongoose.models.Donation || mongoose.model("Donation", DonationSchema);

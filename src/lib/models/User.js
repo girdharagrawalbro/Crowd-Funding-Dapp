@@ -2,12 +2,11 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
-    metaid: {
+    userId: {
       type: String,
       required: true,
       unique: true,
       index: true,
-      lowercase: true,
       trim: true,
     },
     name: {

@@ -2,26 +2,26 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import User from "@/lib/models/User";
 import { toUserDTO } from "@/lib/dto";
-import { normalizeWallet, isConfiguredAdminWallet } from "@/lib/admin";
+import { isAdminUser } from "@/lib/admin";
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const metaid = normalizeWallet(body?.metaid);
+    const userId = (body?.userId || "").trim();
 
-    if (!metaid) {
-      return NextResponse.json({ error: "metaid (wallet) is required" }, { status: 400 });
+    if (!userId) {
+      return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
 
     await connectToDatabase();
 
-    const role = body?.role === "admin" || isConfiguredAdminWallet(metaid) ? "admin" : "user";
+    const role = isAdminUser(userId) ? "admin" : "user";
 
     const user = await User.findOneAndUpdate(
-      { metaid },
+      { userId },
       {
         $set: {
-          metaid,
+          userId,
           name: body?.name?.trim() || "User",
           role,
         },

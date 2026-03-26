@@ -3,7 +3,7 @@ export function toUserDTO(user) {
   return {
     id: user._id.toString(),
     _id: user._id.toString(),
-    metaid: user.metaid,
+    userId: user.userId,
     name: user.name,
     role: user.role,
     createdAt: user.createdAt,
@@ -14,13 +14,12 @@ export function toUserDTO(user) {
 export function toCampaignDTO(campaign) {
   if (!campaign) return null;
   const mongoId = campaign._id.toString();
-  const blockchainId = campaign.blockchainId || null;
 
   return {
-    id: blockchainId || mongoId,
+    id: mongoId,
     mongoId,
-    blockchainId,
-    ownerWallet: campaign.ownerWallet,
+    ownerId: campaign.ownerId,
+    ownerName: campaign.ownerName || "Anonymous",
     title: campaign.title,
     description: campaign.description,
     desc: campaign.description,
@@ -33,8 +32,6 @@ export function toCampaignDTO(campaign) {
     isWithdrawn: campaign.isWithdrawn,
     status: campaign.status,
     approval: campaign.approval,
-    createTxHash: campaign.createTxHash,
-    network: campaign.network,
     createdAt: campaign.createdAt,
     updatedAt: campaign.updatedAt,
   };
@@ -45,12 +42,9 @@ export function toDonationDTO(donation) {
   return {
     id: donation._id.toString(),
     campaignId: donation.campaign.toString(),
-    campaignBlockchainId: donation.campaignBlockchainId,
-    donorWallet: donation.donorWallet,
-    amountEth: donation.amountEth,
-    txHash: donation.txHash,
-    network: donation.network,
-    status: donation.status,
+    donorId: donation.donorId,
+    donorName: donation.donorName || "Anonymous",
+    amount: donation.amount,
     donatedAt: donation.donatedAt,
     createdAt: donation.createdAt,
   };

@@ -37,31 +37,21 @@ const CampaignSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    ownerWallet: {
+    ownerId: {
       type: String,
       required: true,
-      lowercase: true,
       trim: true,
       index: true,
+    },
+    ownerName: {
+      type: String,
+      default: "Anonymous",
+      trim: true,
     },
     ownerUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
-    },
-    blockchainId: {
-      type: String,
-      index: true,
-      sparse: true,
-      unique: true,
-    },
-    createTxHash: {
-      type: String,
-      default: null,
-    },
-    network: {
-      type: String,
-      default: process.env.NEXT_PUBLIC_NETWORK_MODE || "local",
     },
     status: {
       type: String,
@@ -78,6 +68,6 @@ const CampaignSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-CampaignSchema.index({ ownerWallet: 1, status: 1, createdAt: -1 });
+CampaignSchema.index({ ownerId: 1, status: 1, createdAt: -1 });
 
 export default mongoose.models.Campaign || mongoose.model("Campaign", CampaignSchema);

@@ -8,10 +8,17 @@ export async function GET(req) {
   try {
     await connectToDatabase();
     const { searchParams } = new URL(req.url);
-    const eventId = String(searchParams.get("eventId") || "").trim();
+    const campaignId = String(searchParams.get("campaignId") || "").trim();
+    const donorId = String(searchParams.get("donorId") || "").trim();
 
-    const query = eventId ? { campaignBlockchainId: eventId } : {};
-    const donations = await Donation.find(query).sort({ donatedAt: -1 }).lean();
+    const query = {};
+    if (campaignId) query.campaign = campaignId;
+    if (donorId) query.donorId = donorId;
+
+    const donations = await Donation.find(query)
+      .populate("campaign", "title goal amountCollected deadline status")
+      .sort({ donatedAt: -1 })
+      .lean();
 
     return NextResponse.json(donations.map(toDonationDTO));
   } catch (error) {
