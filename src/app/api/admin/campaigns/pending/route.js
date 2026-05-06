@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Campaign from "@/lib/models/Campaign";
 import { toCampaignDTO } from "@/lib/dto";
-import { isAdminWallet } from "@/lib/admin";
+import { isAdminUser } from "@/lib/admin";
 
 export async function GET(req) {
   try {
     await connectToDatabase();
 
-    const adminWallet = req.headers.get("x-admin-wallet") || "";
-    const allowed = await isAdminWallet(adminWallet);
+    const adminId = req.headers.get("x-admin-id") || "";
+    const allowed = isAdminUser(adminId);
 
     if (!allowed) {
-      return NextResponse.json({ error: "Unauthorized admin wallet" }, { status: 403 });
+      return NextResponse.json({ error: "Unauthorized admin" }, { status: 403 });
     }
 
     const campaigns = await Campaign.find({ status: "pending" }).sort({ createdAt: 1 }).lean();

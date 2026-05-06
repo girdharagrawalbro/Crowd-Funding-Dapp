@@ -1,97 +1,79 @@
 "use client";
-import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import { contactABI, contractAddress } from '../lib/constants';
 
 export default function DonorModal({ isOpen, onClose, donors, campaign }) {
-  const [donationAmounts, setDonationAmounts] = useState({});
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchDonationAmounts = async () => {
-      if (!isOpen || donors.length === 0) return;
-
-      setLoading(true);
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(
-          process.env.NEXT_PUBLIC_CONTRACT_ADDRESS,
-          contractABI,
-          signer
-        );
-
-        const amounts = {};
-        for (const donor of donors) {
-          const amount = await contract.getDonationAmount(campaign.id, donor);
-          amounts[donor] = parseFloat(ethers.formatEther(amount));
-        }
-        setDonationAmounts(amounts);
-      } catch (error) {
-        console.error("Error fetching donation amounts:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDonationAmounts();
-  }, [isOpen, donors, campaign?.id]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 backdrop-blur-sm bg-opacity-30 flex items-center justify-center p-2 sm:p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md sm:max-w-2xl max-h-[90vh] sm:max-h-[80vh] overflow-y-auto">
-        <div className="p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-3 sm:mb-4">
-            <h3 className="text-xl sm:text-2xl font-bold">
-              Donors for {campaign?.title}
+    <div className="fixed inset-0 backdrop-blur-md bg-black/30 flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col border border-gray-100 transform animate-in slide-in-from-bottom-8 duration-500">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50 to-teal-50">
+          <div>
+            <h3 className="text-2xl font-black theme-text">
+              Campaign Supporters
             </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl focus:outline-none"
-              aria-label="Close modal"
-            >
-              &times;
-            </button>
+            <p className="text-gray-500 font-medium text-sm">For "{campaign?.title}"</p>
           </div>
+          <button
+            onClick={onClose}
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white hover:shadow-md text-gray-400 hover:text-gray-600 transition-all text-2xl"
+          >
+            &times;
+          </button>
+        </div>
 
-          <div className="mb-3 sm:mb-4">
-            <p className="text-sm sm:text-base font-medium">
-              Total donors: {donors.length}
-            </p>
-            <p className="text-sm sm:text-base font-medium">
-              Total raised: {campaign?.amountCollected.toFixed(5)} ETH
-            </p>
-          </div>
-
-          {loading ? (
-            <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-gray-900"></div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex gap-4 mb-6">
+            <div className="flex-1 bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
+              <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mb-1">Total Donors</p>
+              <p className="text-2xl font-black text-emerald-700">{donors.length}</p>
             </div>
-          ) : (
-            <div className="space-y-1 sm:space-y-2">
-              {donors.length === 0 ? (
-                <p className="text-gray-600 text-sm sm:text-base text-center py-4">
-                  No donors yet
-                </p>
-              ) : (
-                donors.map((donor, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center p-2 sm:p-3 border-b text-xs sm:text-sm"
-                  >
-                    <span className="font-mono truncate max-w-[150px] sm:max-w-none">
-                      {donor.substring(0, 6)}...{donor.substring(donor.length - 4)}
-                    </span>
-                    <span className="text-gray-600 whitespace-nowrap">
-                      {donationAmounts[donor]?.toFixed(5) || '0.0000'} ETH
+            <div className="flex-1 bg-teal-50 rounded-2xl p-4 border border-teal-100">
+              <p className="text-xs text-teal-600 font-bold uppercase tracking-widest mb-1">Total Raised</p>
+              <p className="text-2xl font-black text-teal-700">₹{campaign?.amountCollected?.toLocaleString() || 0}</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {donors.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400 font-medium">No donations yet. Be the first to support!</p>
+              </div>
+            ) : (
+              donors.map((donor, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center p-4 rounded-2xl bg-gray-50 border border-gray-100 hover:bg-white hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center font-bold text-emerald-700 group-hover:from-emerald-200 group-hover:to-teal-200 transition-colors">
+                      {donor.donorName?.charAt(0) || 'D'}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-800">{donor.donorName || "Anonymous Supporter"}</p>
+                      <p className="text-xs text-gray-400">{new Date(donor.donatedAt || Date.now()).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-lg font-black theme-text">
+                      ₹{donor.amount?.toLocaleString() || 0}
                     </span>
                   </div>
-                ))
-              )}
-            </div>
-          )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-gray-50 border-t border-gray-100 text-center">
+          <button
+            onClick={onClose}
+            className="text-sm font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest transition-colors"
+          >
+            Close Details
+          </button>
         </div>
       </div>
     </div>

@@ -2,54 +2,57 @@
 
 export default function DonationCard({ donation, onRefund }) {
   const progress = (donation.amountCollected / donation.goal) * 100;
-  
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-xl font-semibold mb-2">{donation.title}</h3>
-      
-      <div className="mb-2">
-        <span className="font-medium">Your donation: </span>
-        {donation.amount.toFixed(5)} ETH
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+      <h3 className="text-xl font-bold mb-4 theme-text truncate">{donation.title}</h3>
+
+      <div className="space-y-3 mb-6">
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Your Contribution</span>
+          <span className="text-lg font-black text-emerald-600">₹{donation.amount?.toLocaleString()}</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Campaign Goal</span>
+          <span className="text-sm font-bold text-gray-700">₹{donation.goal?.toLocaleString()}</span>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <span className="text-gray-400 text-xs font-bold uppercase tracking-wider">Total Raised</span>
+          <span className="text-sm font-bold text-teal-600">₹{donation.amountCollected?.toLocaleString()}</span>
+        </div>
       </div>
-      
-      <div className="mb-2">
-        <span className="font-medium">Goal: </span>
-        {donation.goal.toFixed(5)} ETH
-      </div>
-      
-      <div className="mb-2">
-        <span className="font-medium">Raised: </span>
-        {donation.amountCollected.toFixed(5)} ETH
-      </div>
-      
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-        <div 
-          className="bg-blue-500 h-2.5 rounded-full" 
+
+      <div className="w-full bg-gray-100 rounded-full h-2.5 mb-6 overflow-hidden">
+        <div
+          className="bg-gradient-to-r from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${Math.min(progress, 100)}%` }}
         ></div>
       </div>
-      
-      <div className="mb-4">
-        <span className="font-medium">Deadline: </span>
-        {donation.deadline.toLocaleDateString()}
-        {donation.isEnded && ' (Ended)'}
+
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col">
+          <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Deadline</span>
+          <span className="text-sm font-bold text-gray-600">
+            {new Date(donation.deadline).toLocaleDateString()}
+            {donation.isEnded && <span className="text-red-400 ml-1">(Ended)</span>}
+          </span>
+        </div>
+        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${donation.isSuccessful ? 'bg-blue-100 text-blue-700' :
+            donation.isEligibleForRefund ? 'bg-red-100 text-red-700' :
+              'bg-emerald-100 text-emerald-700'
+          }`}>
+          {donation.isSuccessful ? 'Successful' :
+            donation.isEligibleForRefund ? 'Refund Available' :
+              'In Progress'}
+        </div>
       </div>
-      
-      <div className="mb-4">
-        <span className="font-medium">Status: </span>
-        {donation.isSuccessful ? (
-          <span className="text-blue-600">Successful</span>
-        ) : donation.isEligibleForRefund ? (
-          <span className="text-red-600">Eligible for refund</span>
-        ) : (
-          <span>Active</span>
-        )}
-      </div>
-      
+
       {donation.isEligibleForRefund && (
-        <button 
-          onClick={() => onRefund(donation.id)}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded w-full text-sm"
+        <button
+          onClick={() => onRefund(donation._id || donation.id)}
+          className="w-full bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-black py-3 rounded-xl shadow-lg shadow-rose-100 transform active:scale-95 transition-all text-sm uppercase tracking-widest"
         >
           Request Refund
         </button>

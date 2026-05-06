@@ -2,18 +2,18 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import Campaign from "@/lib/models/Campaign";
 import { toCampaignDTO } from "@/lib/dto";
-import { isAdminWallet, normalizeWallet } from "@/lib/admin";
+import { isAdminUser } from "@/lib/admin";
 
 export async function POST(req, { params }) {
   try {
     await connectToDatabase();
 
     const body = await req.json();
-    const adminWallet = normalizeWallet(req.headers.get("x-admin-wallet") || body?.adminWallet || "");
+    const adminId = req.headers.get("x-admin-id") || body?.adminId || "";
 
-    const allowed = await isAdminWallet(adminWallet);
+    const allowed = isAdminUser(adminId);
     if (!allowed) {
-      return NextResponse.json({ error: "Unauthorized admin wallet" }, { status: 403 });
+      return NextResponse.json({ error: "Unauthorized admin" }, { status: 403 });
     }
 
     const note = body?.note?.trim() || "Rejected by admin";
@@ -24,7 +24,7 @@ export async function POST(req, { params }) {
         $set: {
           status: "rejected",
           approval: {
-            reviewedBy: adminWallet,
+            reviewedBy: adminId,
             note,
             reviewedAt: new Date(),
           },

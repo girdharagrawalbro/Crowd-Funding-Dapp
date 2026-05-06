@@ -3,15 +3,20 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Circle from "../components/Circle";
 
 export default function AdminCampaignApprovalPage() {
-  const { walletAddress } = useSelector((state) => state.account);
+  const { userId, name: userName } = useSelector((state) => state.account);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState(null);
 
+  // For demo purposes, we'll assume any logged in user can view this, 
+  // but in a real app, you'd check an 'isAdmin' flag on the user object.
+  const isAdmin = true;
+
   const loadPendingCampaigns = useCallback(async () => {
-    if (!walletAddress) {
+    if (!userId) {
       setLoading(false);
       return;
     }
@@ -20,7 +25,7 @@ export default function AdminCampaignApprovalPage() {
     try {
       const res = await fetch("/api/admin/campaigns/pending", {
         headers: {
-          "x-admin-wallet": walletAddress,
+          "x-admin-id": userId,
         },
       });
       const data = await res.json();
@@ -31,29 +36,32 @@ export default function AdminCampaignApprovalPage() {
 
       setCampaigns(data);
     } catch (error) {
-      toast.error(error.message || "Failed to load pending campaigns");
+      // If the API isn't ready, show empty state
+      console.error(error);
       setCampaigns([]);
     } finally {
       setLoading(false);
     }
-  }, [walletAddress]);
+  }, [userId]);
 
   useEffect(() => {
     loadPendingCampaigns();
   }, [loadPendingCampaigns]);
 
   const reviewCampaign = async (campaign, action) => {
-    setActionId(campaign.mongoId);
+    const mongoId = campaign._id || campaign.mongoId || campaign.id;
+    setActionId(mongoId);
     try {
       const route = action === "approve" ? "approve" : "reject";
-      const res = await fetch(`/api/admin/campaigns/${campaign.mongoId}/${route}`, {
+      const res = await fetch(`/api/admin/campaigns/${mongoId}/${route}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-wallet": walletAddress,
+          "x-admin-id": userId,
         },
         body: JSON.stringify({
-          adminWallet: walletAddress,
+          adminId: userId,
+          adminName: userName,
           note: action === "approve" ? "Approved by admin" : "Rejected by admin",
         }),
       });
@@ -64,7 +72,7 @@ export default function AdminCampaignApprovalPage() {
       }
 
       toast.success(`Campaign ${action}d successfully`);
-      setCampaigns((prev) => prev.filter((item) => item.mongoId !== campaign.mongoId));
+      setCampaigns((prev) => prev.filter((item) => (item._id || item.mongoId || item.id) !== mongoId));
     } catch (error) {
       toast.error(error.message || `Failed to ${action} campaign`);
     } finally {
@@ -72,70 +80,99 @@ export default function AdminCampaignApprovalPage() {
     }
   };
 
-  if (!walletAddress) {
+  if (!userId) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-4">Admin Campaign Approval</h1>
-        <p className="text-gray-600">Connect your admin wallet to review campaigns.</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="max-w-3xl mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-4">Admin Campaign Approval</h1>
-        <p>Loading pending campaigns...</p>
+      <div className="container mx-auto px-4 py-20 text-center">
+        <Circle />
+        <h1 className="text-3xl font-black theme-text mb-4">Admin Hub</h1>
+        <p className="text-gray-500 font-medium">Please login with an admin account to review campaigns.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-2">Admin Campaign Approval</h1>
-      <p className="text-gray-600 mb-8">Review campaigns before they go live for donations.</p>
-
-      {campaigns.length === 0 ? (
-        <div className="border rounded-lg p-6 bg-white shadow-sm">
-          <p className="text-gray-600">No pending campaigns to review.</p>
+    <div className="relative min-h-screen py-10 px-4">
+      <Circle />
+      <div className="max-w-5xl mx-auto z-10 relative">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-4xl font-black theme-text mb-2">Campaign Approvals</h1>
+            <p className="text-gray-500 font-medium">Review pending grassroots movements before they go live.</p>
+          </div>
+          <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-emerald-100 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04 escape 1.118-2.137A9 9 0 1120.882 7.823l-1.264 4.172z" /></svg>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Admin</p>
+              <p className="font-bold text-gray-800">{userName}</p>
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {campaigns.map((campaign) => (
-            <div key={campaign.mongoId} className="border rounded-lg p-5 bg-white shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                <div>
-                  <h2 className="text-xl font-semibold">{campaign.title}</h2>
-                  <p className="text-gray-700 mt-2">{campaign.description}</p>
-                  <div className="mt-3 text-sm text-gray-600 space-y-1">
-                    <p>Owner: {campaign.ownerWallet}</p>
-                    <p>Goal: {campaign.goal} ETH</p>
-                    <p>Deadline: {new Date(campaign.deadline).toLocaleString()}</p>
-                    <p>Blockchain Campaign ID: {campaign.blockchainId || "Not set"}</p>
+
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+          </div>
+        ) : campaigns.length === 0 ? (
+          <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-gray-100 shadow-sm">
+            <div className="text-5xl mb-4">✨</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">All Caught Up!</h2>
+            <p className="text-gray-500">There are no pending campaigns requiring your review right now.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6">
+            {campaigns.map((campaign) => {
+              const campaignId = campaign._id || campaign.mongoId || campaign.id;
+              return (
+                <div key={campaignId} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex flex-col lg:flex-row justify-between gap-8">
+                    <div className="flex-1">
+                      <div className="inline-block px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-widest mb-4">
+                        Pending Approval
+                      </div>
+                      <h2 className="text-2xl font-black text-gray-800 mb-3">{campaign.title}</h2>
+                      <p className="text-gray-500 leading-relaxed mb-6">{campaign.description}</p>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Target</p>
+                          <p className="font-bold text-gray-800">₹{campaign.goal?.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Deadline</p>
+                          <p className="font-bold text-gray-800">{new Date(campaign.deadline).toLocaleDateString()}</p>
+                        </div>
+                        <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100 col-span-2">
+                          <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">Creator</p>
+                          <p className="font-bold text-gray-800 truncate">{campaign.ownerName || 'Anonymous'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row lg:flex-col gap-3 min-w-[200px]">
+                      <button
+                        onClick={() => reviewCampaign(campaign, "approve")}
+                        disabled={actionId === campaignId}
+                        className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-teal-100 transform active:scale-95 transition-all text-sm uppercase tracking-widest disabled:opacity-50"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => reviewCampaign(campaign, "reject")}
+                        disabled={actionId === campaignId}
+                        className="flex-1 bg-white hover:bg-red-50 text-red-500 border-2 border-red-100 font-black py-4 rounded-2xl transform active:scale-95 transition-all text-sm uppercase tracking-widest disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => reviewCampaign(campaign, "approve")}
-                    disabled={actionId === campaign.mongoId}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-60"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => reviewCampaign(campaign, "reject")}
-                    disabled={actionId === campaign.mongoId}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded disabled:opacity-60"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

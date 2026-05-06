@@ -13,10 +13,10 @@ export async function GET(_req, { params }) {
       .lean();
 
     const donors = donations.map((donation) => ({
-      account: donation.donorWallet,
-      amount: donation.amountEth,
-      txHash: donation.txHash,
-      timestamp: donation.donatedAt,
+      donorId: donation.donorId,
+      donorName: donation.donorName,
+      amount: donation.amount,
+      donatedAt: donation.donatedAt,
     }));
 
     return NextResponse.json({ donors });

@@ -1,86 +1,116 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-// CREATE USER — POST /api/users
+// Fetch user profile
+export const fetchUser = createAsyncThunk(
+    'user/fetchUser',
+    async (userId, thunkAPI) => {
+        try {
+            const res = await fetch(`/api/users/${userId}`)
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to fetch user')
+            return data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message)
+        }
+    }
+)
+
+// Create or update user
 export const createUser = createAsyncThunk(
-  'user/createUser',
-  async (userData, thunkAPI) => {
-    try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create user');
-      return data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+    'user/createUser',
+    async (userData, thunkAPI) => {
+        try {
+            const res = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData),
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Failed to create user')
+            return data
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message)
+        }
     }
-  }
-);
+)
 
-// UPDATE USER NAME — PATCH /api/users/:metaid
+// Update user name
 export const updateUserName = createAsyncThunk(
-  'user/updateUserName',
-  async ({ metaid, name }, thunkAPI) => {
-    try {
-      const res = await fetch(`/api/users/${metaid}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      });
+    'user/updateUserName',
+    async (newName, { getState, rejectWithValue }) => {
+        const state = getState();
+        const userId = state.account.userId;
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: newName }),
+            });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to update user');
-      return data.user;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+            if (!response.ok) {
+                const errorData = await response.json();
+                return rejectWithValue(errorData.error || 'Failed to update name');
+            }
+
+            return await response.json();
+        } catch (error) {
+            return rejectWithValue(error.message || 'An error occurred while updating the name');
+        }
     }
-  }
 );
 
 const userSlice = createSlice({
-  name: 'user',
-  initialState: {
-    user: null,
-    status: 'idle',
-    error: null,
-  },
-  reducers: {
-    clearUser: (state) => {
-      state.user = null;
-      state.status = 'idle';
-      state.error = null;
+    name: 'user',
+    initialState: {
+        user: null,
+        status: 'idle',
+        error: null,
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(createUser.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(createUser.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload;
-      })
-      .addCase(createUser.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
+    reducers: {
+        clearUser: (state) => {
+            state.user = null
+            state.status = 'idle'
+            state.error = null
+        },
+    },
+    extraReducers: (builder) => {
+        builder
+            // Fetch User
+            .addCase(fetchUser.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(fetchUser.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.user = action.payload
+            })
+            .addCase(fetchUser.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.payload
+            })
 
-      .addCase(updateUserName.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(updateUserName.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload;
-      })
-      .addCase(updateUserName.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      });
-  },
-});
+            // Create User
+            .addCase(createUser.pending, (state) => {
+                state.status = 'loading'
+            })
+            .addCase(createUser.fulfilled, (state, action) => {
+                state.status = 'succeeded'
+                state.user = action.payload
+            })
+            .addCase(createUser.rejected, (state, action) => {
+                state.status = 'failed'
+                state.error = action.payload
+            })
 
-export const { clearUser } = userSlice.actions;
-export default userSlice.reducer;
+            // Update Name
+            .addCase(updateUserName.fulfilled, (state, action) => {
+                if (state.user) {
+                    state.user.name = action.payload.name;
+                }
+            })
+    },
+})
+
+export const { clearUser } = userSlice.actions
+export default userSlice.reducer

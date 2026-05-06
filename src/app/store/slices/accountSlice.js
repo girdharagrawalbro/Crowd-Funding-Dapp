@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  walletAddress: null,
+  userId: null,
+  name: null,
   balance: "0",
 };
 
@@ -10,11 +11,13 @@ const accountSlice = createSlice({
   initialState,
   reducers: {
     setAccount: (state, action) => {
-      state.walletAddress = action.payload.walletAddress;
-      state.balance = action.payload.balance;
+      state.userId = action.payload.userId;
+      state.name = action.payload.name;
+      state.balance = action.payload.balance || "0";
     },
     disconnectAccount: (state) => {
-      state.walletAddress = null;
+      state.userId = null;
+      state.name = null;
       state.balance = "0";
     },
   },

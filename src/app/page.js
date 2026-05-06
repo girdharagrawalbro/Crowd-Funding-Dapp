@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { USE_MOCK_DATA, getAllMockCampaigns } from "./lib/mockData";
 import Link from "next/link";
 import toast from 'react-hot-toast';
 import Image from 'next/image';
@@ -10,7 +9,7 @@ const ITEMS_PER_PAGE = 5;
 export default function Home() {
   const [campaigns, setCampaigns] = useState([]);
   const [filteredCampaigns, setFilteredCampaigns] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [trandingfilteredCampaigns, settrandingFilteredCampaigns] = useState([]);
@@ -29,26 +28,20 @@ export default function Home() {
     };
   };
 
-  
   useEffect(() => {
     setMounted(true);
     const loadCampaigns = async () => {
       try {
-        if (USE_MOCK_DATA) {
-          // Use mock data for screenshots/demo (includes newly created campaigns)
-          setCampaigns(getAllMockCampaigns());
-          setLoading(false);
-          return;
-        }
         const res = await fetch('/api/events');
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to load campaigns');
 
-        setCampaigns(data.map(normalizeCampaign));
-        setLoading(false);
+        const normalized = data.map(normalizeCampaign);
+        setCampaigns(normalized);
       } catch (error) {
         console.error("Error loading campaigns:", error);
         toast.error("Error loading campaigns");
+      } finally {
         setLoading(false);
       }
     };
@@ -56,18 +49,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    // Filter campaigns when campaigns data changes
     if (campaigns.length > 0) {
-      const now = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+      const now = Math.floor(Date.now() / 1000);
       const filtered = campaigns.filter(campaign =>
-        (campaign.deadlineTs || campaign.deadline) > now // Only show active campaigns
+        (campaign.deadlineTs || campaign.deadline) > now
       );
       setFilteredCampaigns(filtered);
     }
   }, [campaigns]);
 
   useEffect(() => {
-    // Filter out campaigns whose deadlines have passed
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -88,9 +79,9 @@ export default function Home() {
   const handlePrevious = () => {
     setCurrentIndex((prevIndex) => (prevIndex - ITEMS_PER_PAGE + trandingfilteredCampaigns.length) % trandingfilteredCampaigns.length);
   };
-  if (loading) return <div>Loading...</div>;
 
   const visibleCampaigns = trandingfilteredCampaigns.slice(currentIndex, currentIndex + ITEMS_PER_PAGE);
+
   if (loading) {
     return (
       <div className="flex h-96 justify-center items-center py-60">
@@ -102,9 +93,7 @@ export default function Home() {
   return (
     <>
       <section className={`main px-4 md:px-8 pb-8 ${mounted ? 'section-animate' : 'opacity-0'}`}>
-        {/* Hero Content */}
         <div className="flex flex-col lg:flex-row items-center">
-          {/* Logo - Shows on mobile but smaller */}
           <div className={`${mounted ? 'delayed-animate-1' : 'opacity-0'} mb-8 lg:mb-0`}>
             <Image
               src="/logo.png"
@@ -116,8 +105,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Text Content */}
-          <div className={`flex flex-col gap-6 md:gap-10 pt-0 md:pt-4 jusify-center text-center items-center lg:items-center ${mounted ? 'delayed-animate-2' : 'opacity-0'} w-full lg:w-auto`}>
+          <div className={`flex flex-col gap-6 md:gap-10 pt-0 md:pt-4 justify-center text-center items-center lg:items-center ${mounted ? 'delayed-animate-2' : 'opacity-0'} w-full lg:w-auto`}>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl stroke-text leading-tight text-center">
               Your Contribution, Their Transformation.
             </h1>
@@ -144,33 +132,31 @@ export default function Home() {
           </div>
         </div>
 
-
-        {/* Stats Section */}
         <div className={`rounded border-green-800 border px-4 md:px-8 py-4 md:py-6 bg-white mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ${mounted ? 'opacity-animate' : 'opacity-0'}`}>
           <div className="text-center sm:text-left">
             <h4 className="text-lg md:text-xl theme-text font-bold">
-              Fundraise at a minimal platform fee.
+              Fundraise with ₹0 Platform Fee.
             </h4>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-start">
-            <Image src="/clock.png" alt="icon" width={24} height={24} className="text-green-500" />
-            <h4 className="text-lg md:text-xl text-gray-600 font-bold text-center sm:text-left">
-              Fast and Reliable Funds Disbursal
+            <Image src="/clock.png" alt="icon" width={24} height={24} />
+            <h4 className="text-lg md:text-xl text-gray-600 font-bold">
+              Fast Rupee Disbursal
             </h4>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-start">
-            <Image src="/people.png" alt="icon" width={24} height={24} className="text-green-500" />
-            <h4 className="text-lg md:text-xl text-gray-600 font-bold text-center sm:text-left">
-              Patients Successfully Supported
+            <Image src="/people.png" alt="icon" width={24} height={24} />
+            <h4 className="text-lg md:text-xl text-gray-600 font-bold">
+              Direct Community Support
             </h4>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2 justify-center sm:justify-start">
-            <Image src="/charity.png" alt="icon" width={24} height={24} className="text-green-500" />
-            <h4 className="text-lg md:text-xl text-gray-600 font-bold text-center sm:text-left">
-              Countless Lives Positively Impacted
+            <Image src="/charity.png" alt="icon" width={24} height={24} />
+            <h4 className="text-lg md:text-xl text-gray-600 font-bold">
+              Impact Lives Today
             </h4>
           </div>
         </div>
@@ -192,7 +178,6 @@ export default function Home() {
                   key={index}
                   className="shadow-lg p-3 w-full flex flex-col md:flex-row items-center gap-4 justify-between border border-green-300 rounded-lg"
                 >
-                  {/* Progress Circle - Now on top for mobile */}
                   <div className="relative w-24 h-24 md:w-32 md:h-32">
                     <svg className="w-full h-full" viewBox="0 0 36 36">
                       <path
@@ -218,18 +203,17 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Campaign Info */}
                   <div className="flex-1 flex flex-col items-center md:items-start gap-1 md:gap-2">
                     <p className="text-lg md:text-2xl font-medium capitalize text-center md:text-left">
                       Funding for {campaign.title}
                     </p>
                     <p className="text-gray-600 text-sm md:text-xl">Raised</p>
                     <p className="text-lg md:text-2xl font-medium">
-                      <span className="text-blue-500"> {campaign.amountCollected} ETH </span>
-                      of {campaign.goal} ETH
+                      <span className="text-blue-500"> ₹ {campaign.amountCollected} </span>
+                      of ₹ {campaign.goal}
                     </p>
                     <Link
-                      href={`/campaign/${campaign.id}`}
+                      href={`/campaign/${campaign._id || campaign.id}`}
                       className="bg-pink-600 hover:bg-pink-700 text-white py-1 md:py-2 px-3 md:px-4 rounded-full mt-1 md:mt-2 font-medium text-sm md:text-base transition-colors"
                     >
                       Donate Now
@@ -256,9 +240,6 @@ export default function Home() {
                 <p className="text-xl md:text-2xl font-bold text-gray-600 mb-2 md:mb-4">
                   No trending campaigns found
                 </p>
-                <p className="text-gray-500 text-sm md:text-base max-w-md mx-auto">
-                  All current campaigns have either ended or been successfully funded
-                </p>
               </div>
             )}
           </div>
@@ -267,15 +248,13 @@ export default function Home() {
             <div className="flex justify-center gap-4 mt-4 md:mt-6">
               <button
                 onClick={handlePrevious}
-                disabled={currentIndex === 0}
-                className={`bg-green-600 text-white font-bold py-1 md:py-2 px-3 rounded-full ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
+                className={`bg-green-600 text-white font-bold py-1 md:py-2 px-3 rounded-full hover:bg-green-700`}
               >
                 {"<"}
               </button>
               <button
                 onClick={handleNext}
-                disabled={currentIndex >= campaigns.length - ITEMS_PER_PAGE}
-                className={`bg-green-600 text-white font-bold py-1 md:py-2 px-3 rounded-full ${currentIndex >= campaigns.length - ITEMS_PER_PAGE ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-700'}`}
+                className={`bg-green-600 text-white font-bold py-1 md:py-2 px-3 rounded-full hover:bg-green-700`}
               >
                 {">"}
               </button>
@@ -299,7 +278,6 @@ export default function Home() {
       `}</style>
       </section>
 
-
       <section id="campaign" className={`p-4 sm:p-6 ${mounted ? 'section-animate' : 'opacity-0'}`}>
         <div className="p-2 sm:p-6">
           <h1 className="font-bold main-text text-center mb-4 sm:mb-6 text-2xl sm:text-3xl">
@@ -316,8 +294,7 @@ export default function Home() {
                 return (
                   <div
                     key={index}
-                    className={`py-3 px-4 sm:py-4 sm:px-6 rounded-lg shadow-lg border-2 ${isGoalMet ? 'border-green-500' : 'border-blue-500'
-                      }`}
+                    className={`py-3 px-4 sm:py-4 sm:px-6 rounded-lg shadow-lg border-2 ${isGoalMet ? 'border-green-500' : 'border-blue-500'}`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex flex-col flex-1">
@@ -338,12 +315,12 @@ export default function Home() {
                         <div className="grid grid-cols-2 gap-2 mt-2 sm:mt-3">
                           <div>
                             <p className="text-xs sm:text-sm text-gray-500">Goal</p>
-                            <p className="text-base sm:text-lg font-medium">{campaign.goal} ETH</p>
+                            <p className="text-base sm:text-lg font-medium">₹ {campaign.goal}</p>
                           </div>
                           <div>
                             <p className="text-xs sm:text-sm text-gray-500">Collected</p>
                             <p className="text-base sm:text-lg font-medium">
-                              {campaign.amountCollected} ETH
+                              ₹ {campaign.amountCollected}
                             </p>
                           </div>
                           <div>
@@ -393,7 +370,7 @@ export default function Home() {
 
                     <div className="flex justify-center mt-3 sm:mt-4">
                       <Link
-                        href={`/campaign/${campaign.id}`}
+                        href={`/campaign/${campaign._id || campaign.id}`}
                         className="bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 text-white py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-base"
                       >
                         View Details
@@ -421,15 +398,11 @@ export default function Home() {
                 <p className="text-xl sm:text-2xl font-bold text-gray-600 mb-2 sm:mb-4">
                   No active campaigns found
                 </p>
-                <p className="text-gray-500 text-sm sm:text-base max-w-md mx-auto">
-                  All current campaigns have either ended or been successfully funded
-                </p>
               </div>
             )}
           </div>
         </div>
       </section>
-
     </>
   );
 }
